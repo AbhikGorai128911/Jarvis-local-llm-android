@@ -1,0 +1,5 @@
+{
+    "whatsapp": "com.whatsapp/.Main",
+    "spotify": "com.spotify.music/.MainActivity",
+    "termux": "com.termux/.HomeActivity"
+}

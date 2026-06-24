@@ -1,5 +1,5 @@
 from urllib import response
-
+from llm.local_llm import ask
 from core.network import is_online
 from core.router import route_command
 from core.tts import speak
@@ -25,6 +25,7 @@ def boot():
 
     print("[SYSTEM] READY")
 
+    speak("Jarvis ready for command")
 
 def main():
 
@@ -41,7 +42,6 @@ def main():
             "USER",
             user_input
         )
-
         if not user_input:
             continue
 
@@ -70,19 +70,29 @@ def main():
 
 
         response = route_command(user_input)
-
         
+
 
         if response.get("llm_candidate"):
 
             choice = input(
-                "Unknown command. Use local LLM? (y/N): "
+                "JARVIS > Use local model? (Y/n): "
             ).strip().lower()
 
-            if choice in ["y", "yes"]:
-                from llm.local_llm import ask
+            if choice in ["y", "yes", ""]:
 
-                ask(user_input)
+                message = ask(user_input)
+
+                #print(f"\nJARVIS > {message}")
+
+                speak(message)
+
+                log(f"JARVIS: {message}")
+
+                save_message(
+                    "JARVIS",
+                    message
+                )
 
             continue
 
@@ -93,7 +103,7 @@ def main():
         f"JARVIS: {response['message']}"
         )
 
-        print(f"JARVIS > {response['message']}")
+        #print(f"JARVIS > {response['message']}")
         speak(response["message"])
 
 

@@ -1,5 +1,5 @@
 from core.network import is_online
-import webbrowser
+import subprocess
 
 
 def execute(command):
@@ -17,7 +17,7 @@ def execute(command):
         "google",
         "web",
         "internet",
-        "for"
+        "for",
     ]
 
     for keyword in keywords:
@@ -33,9 +33,19 @@ def execute(command):
 
     url = f"https://www.google.com/search?q={query}"
 
-    webbrowser.open(url)
+    try:
+        subprocess.run(
+            ["termux-open-url", url],
+            check=True,
+        )
 
-    return {
-        "success": True,
-        "message": f"Searching for {query}"
-    }
+        return {
+            "success": True,
+            "message": f"Searching for {query}"
+        }
+
+    except Exception as error:
+        return {
+            "success": False,
+            "message": str(error)
+        }

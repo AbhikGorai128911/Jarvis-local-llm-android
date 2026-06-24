@@ -1,0 +1,28 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Local models
+models/
+*.gguf
+
+# llama.cpp
+llama.cpp/
+
+# Logs and memory
+logs/
+memory/
+
+# Generated/test files
+llm_output.txt
+test.txt
+
+# Zip archives
+*.zip
+
+# Termux
+.termux/
+
+# OS files
+.DS_Store
