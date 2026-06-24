@@ -26,3 +26,29 @@ test.txt
 
 # OS files
 .DS_Store
+
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Local models
+models/
+*.gguf
+
+# llama.cpp
+llama.cpp/
+
+# Databases
+*.db
+
+# Logs
+logs/
+
+# Generated files
+llm_output.txt
+test.txt
+
+# Archives
+*.zip
