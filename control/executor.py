@@ -5,6 +5,9 @@ from commands.memory_commands import execute as memory_execute
 from commands.browser import execute as browser_execute
 from commands.music import execute as music_execute
 from llm.local_llm import ask
+from commands.device import execute as device_execute
+from capabilities.resolver import resolve
+from capabilities.executor import execute as device_execute
 
 def execute(intent, user_input):
 
@@ -26,7 +29,9 @@ def execute(intent, user_input):
     if intent == "music":
         return music_execute(user_input)
     
-
+    if intent == "device":
+        resolved = resolve(intent, user_input)
+    return device_execute(resolved)
 
     if intent == "unknown":
         ask(user_input)

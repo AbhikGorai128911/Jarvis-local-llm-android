@@ -4,8 +4,10 @@ KNOWN_INTENTS = {
     "music",
     "time",
     "files",
-    "memory"
-    "browser"
+    "memory",
+    "browser",
+    "device",
+    "communication"
     
 }
 

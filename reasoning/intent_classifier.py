@@ -5,6 +5,10 @@ def classify(user_input):
 
     text = user_input.lower()
 
+    if "volume" in text:
+        return "device"
+
+
     if any(word in text for word in [
         "open",
         "launch",
@@ -23,7 +27,9 @@ def classify(user_input):
     if any(word in text for word in [
         "music",
         "song",
-        "play"
+        "play music"
+        "spotify"
+        "metro"
     ]):
         return "music"
 
@@ -52,18 +58,25 @@ def classify(user_input):
         "stackoverflow"
     ]):
         return "browser"
-    
 
     if any(word in text for word in [
-        "music",
-        "play",
-        "pause",
-        "next",
-        "previous",
-        "volume"
+        "bluetooth",
+        "wifi",
+        "mobile data",
+        "hotspot",
+        "airplane mode",
+        "volume",
+        "brightness",
+        "torch"
     ]):
-        return "music"
+        return "device"
 
+    if any(word in text for word in [
+        "message",
+        "text",
+        "sms"
+    ]):
+        return "communication"
 
 
     if text.startswith("remember"):

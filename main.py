@@ -10,6 +10,8 @@ from control.pending_actions import (
     get_pending,
     clear_pending
 )
+from llm.local_llm import ask as ask_dynamic
+from llm.persistent_llm import start_llm, stop_llm, ask_persistent
 
 
 
@@ -23,13 +25,21 @@ def boot():
     else:
         print("[NETWORK] OFFLINE")
 
+    choice = input(
+        "[AI] Enable persistent LLM mode? (Y/n): "
+    ).strip().lower()
+
+    persistent_ai = choice not in ["n", "no"]
+
     print("[SYSTEM] READY")
 
     speak("Jarvis ready for command")
 
+    return persistent_ai
+
 def main():
 
-    boot()
+    persistent_ai = boot()
 
     initialize()
 
@@ -46,6 +56,11 @@ def main():
             continue
 
         if user_input.lower() in ["exit", "quit"]:
+            
+            if persistent_ai:
+                # stop_llm() will be added later
+                pass
+
             print("JARVIS > Shutting down.")
             break
 

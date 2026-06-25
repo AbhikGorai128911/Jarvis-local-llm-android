@@ -1,5 +1,6 @@
 {
     "whatsapp": "com.whatsapp/.Main",
     "spotify": "com.spotify.music/.MainActivity",
-    "termux": "com.termux/.HomeActivity"
+    "termux": "com.termux/.HomeActivity",
+    "youtube": "com.google.android.youtube/.HomeActivity"
 }
