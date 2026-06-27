@@ -121,6 +121,26 @@ def execute(command):
             "success": True,
             "message": f"Battery is {data['percentage']}%"
         }
+     
+
+    #
+    #Display
+    #
+    if target == "brightness":
+
+        subprocess.run([
+            "am",
+            "start",
+            "-a",
+            "android.settings.DISPLAY_SETTINGS"
+        ])
+
+        return {
+            "success": True,
+            "message": "Opened display settings."
+        }
+
+
 
     #
     # Volume
