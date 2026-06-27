@@ -4,10 +4,9 @@ from commands.files import execute as file_execute
 from commands.memory_commands import execute as memory_execute
 from commands.browser import execute as browser_execute
 from commands.music import execute as music_execute
-from llm.local_llm import ask
 from commands.device import execute as device_execute
-from capabilities.resolver import resolve
-from capabilities.executor import execute as device_execute
+from llm.local_llm import ask
+
 
 def execute(intent, user_input):
 
@@ -16,22 +15,21 @@ def execute(intent, user_input):
 
     if intent == "web":
         return web_execute(user_input)
-    
+
     if intent == "files":
         return file_execute(user_input)
-    
+
     if intent == "memory":
         return memory_execute(user_input)
-    
+
     if intent == "browser":
         return browser_execute(user_input)
-    
+
     if intent == "music":
         return music_execute(user_input)
-    
+
     if intent == "device":
-        resolved = resolve(intent, user_input)
-    return device_execute(resolved)
+        return device_execute(user_input)
 
     if intent == "unknown":
         ask(user_input)

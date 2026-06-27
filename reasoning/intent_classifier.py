@@ -67,7 +67,13 @@ def classify(user_input):
         "airplane mode",
         "volume",
         "brightness",
-        "torch"
+        "torch",
+        "data",
+        "airplane",
+        "flash",
+        "flashlight",
+        "battery",
+        "display"
     ]):
         return "device"
 
