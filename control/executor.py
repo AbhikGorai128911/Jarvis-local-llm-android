@@ -3,10 +3,13 @@ from commands.web_search import execute as web_execute
 from commands.files import execute as file_execute
 from commands.memory_commands import execute as memory_execute
 from commands.browser import execute as browser_execute
-from commands.music import execute as music_execute
+from commands.music.router import execute as music_execute
 from commands.device import execute as device_execute
 from llm.local_llm import ask
 from communication.executor import execute as communication_execute
+from device.normalize import normalize
+from device.parser import parse
+
 
 def execute(intent, user_input):
 
@@ -29,7 +32,7 @@ def execute(intent, user_input):
         return music_execute(user_input)
 
     if intent == "device":
-        return device_execute(user_input)
+        return device_execute(parse(normalize(user_input)))
 
     if intent == "communication":
         return communication_execute(user_input)

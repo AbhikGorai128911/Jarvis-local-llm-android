@@ -1,128 +1,46 @@
-import re
+# device/parser.py
 
-
-# Canonical names
-ACTION_ALIASES = {
-    "on": [
-        "on",
-        "enable",
-        "start",
-        "activate"
-    ],
-
-    "off": [
-        "off",
-        "disable",
-        "stop",
-        "deactivate"
-    ],
-
-    "set": [
-        "set"
-    ],
-
-    "get": [
-        "get",
-        "show",
-        "what",
-        "check"
-    ]
+VALID_ACTIONS = {
+    "torch": ["on", "off"],
+    "wifi": ["on", "off"],
+    "bluetooth": ["on", "off"],
+    "volume": ["set", "get"],
+    "brightness": ["set", "get"],
+    "battery": ["get"]
 }
 
 
-TARGET_ALIASES = {
-    "torch": [
-        "torch",
-        "flashlight",
-        "flash light"
-    ],
+def parse(normalized):
 
-    "wifi": [
-        "wifi",
-        "wi-fi"
-    ],
+    action = normalized.get("action")
+    target = normalized.get("target")
 
-    "bluetooth": [
-        "bluetooth",
-        "bt"
-    ],
+    if not action or not target:
+        return {
+            "success": False,
+            "message": "Could not understand device command"
+        }
 
-    "battery": [
-        "battery",
-        "battery percentage",
-        "battery level"
-    ],
+    # enforce rules
+    if target in VALID_ACTIONS:
+        if action not in VALID_ACTIONS[target]:
+            return {
+                "success": False,
+                "message": f"Invalid action '{action}' for {target}"
+            }
 
-    "volume": [
-        "volume",
-        "sound"
-    ],
+    value = None
 
-    "brightness": [
-        "brightness",
-        "diaplay",
-        "screen"
-    ],
-
-    "hotspot": [
-        "hotspot"
-    ],
-
-    "mobile_data": [
-        "mobile data",
-        "data"
-    ]
-}
-
-
-def _find_action(text):
-
-    for canonical, aliases in ACTION_ALIASES.items():
-        for alias in aliases:
-            if alias in text:
-                return canonical
-
-    return None
-
-
-def _find_target(text):
-
-    for canonical, aliases in TARGET_ALIASES.items():
-        for alias in aliases:
-            if alias in text:
-                return canonical
-
-    return None
-
-
-def _find_value(text):
-
-    match = re.search(r"\b\d+\b", text)
+    # optional value extraction
+    import re
+    match = re.search(r"\b\d+\b", normalized.get("raw", ""))
 
     if match:
-        return int(match.group())
-
-    return None
-
-
-def parse(user_input):
-
-    text = user_input.lower().strip()
-
-    action = _find_action(text)
-    target = _find_target(text)
-    value = _find_value(text)
-
-    # Default action for queries
-    if action is None and target in [
-        "battery",
-        "volume"
-    ]:
-        action = "get"
+        value = int(match.group())
 
     return {
+        "success": True,
         "action": action,
         "target": target,
-        "value": value,
-        "raw": user_input
+        "value": value
     }
