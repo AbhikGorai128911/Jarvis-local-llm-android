@@ -3,38 +3,19 @@ import json
 
 
 def _run(command):
-    """
-    Run a subprocess safely.
-    Returns (success, stdout).
-    """
-
     try:
         result = subprocess.run(
             command,
             capture_output=True,
             text=True
         )
+        return result.returncode == 0, result.stdout.strip()
 
-        return (
-            result.returncode == 0,
-            result.stdout.strip()
-        )
-
-    except Exception as error:
-        return False, str(error)
+    except Exception as e:
+        return False, str(e)
 
 
 def execute(command):
-    """
-    Execute a parsed device command.
-
-    command format:
-    {
-        "action": "...",
-        "target": "...",
-        "value": ...
-    }
-    """
 
     action = command.get("action")
     target = command.get("target")
@@ -46,130 +27,73 @@ def execute(command):
             "message": "No device specified."
         }
 
-    #
-    # Wi-Fi
-    #
+    # --------------------
+    # WIFI
+    # --------------------
     if target == "wifi":
+        subprocess.run(["am", "start", "-a", "android.settings.WIFI_SETTINGS"])
+        return {"success": True, "message": "Opened Wi-Fi settings"}
 
-        subprocess.run([
-            "am",
-            "start",
-            "-a",
-            "android.settings.WIFI_SETTINGS"
-        ])
-
-        return {
-            "success": True,
-            "message": "Opened Wi-Fi settings."
-        }
-
-    #
-    # Bluetooth
-    #
+    # --------------------
+    # BLUETOOTH
+    # --------------------
     if target == "bluetooth":
+        subprocess.run(["am", "start", "-a", "android.settings.BLUETOOTH_SETTINGS"])
+        return {"success": True, "message": "Opened Bluetooth settings"}
 
-        subprocess.run([
-            "am",
-            "start",
-            "-a",
-            "android.settings.BLUETOOTH_SETTINGS"
-        ])
-
-        return {
-            "success": True,
-            "message": "Opened Bluetooth settings."
-        }
-
-    #
-    # Torch
-    #
+    # --------------------
+    # TORCH
+    # --------------------
     if target == "torch":
-
         if action == "on":
             _run(["termux-torch", "on"])
-
         elif action == "off":
             _run(["termux-torch", "off"])
-
         else:
-            return {
-                "success": False,
-                "message": "Torch requires on/off."
-            }
+            return {"success": False, "message": "Torch requires on/off"}
 
-        return {
-            "success": True,
-            "message": f"Torch turned {action}."
-        }
+        return {"success": True, "message": f"Torch {action}"}
 
-    #
-    # Battery
-    #
+    # --------------------
+    # BATTERY
+    # --------------------
     if target == "battery":
-
-        ok, output = _run(["termux-battery-status"])
-
+        ok, out = _run(["termux-battery-status"])
         if not ok:
-            return {
-                "success": False,
-                "message": output
-            }
+            return {"success": False, "message": out}
 
-        data = json.loads(output)
+        data = json.loads(out)
+        return {"success": True, "message": f"{data['percentage']}%"}
 
-        return {
-            "success": True,
-            "message": f"Battery is {data['percentage']}%"
-        }
-     
-
-    #
-    #Display
-    #
-    if target == "brightness":
-
-        subprocess.run([
-            "am",
-            "start",
-            "-a",
-            "android.settings.DISPLAY_SETTINGS"
-        ])
-
-        return {
-            "success": True,
-            "message": "Opened display settings."
-        }
-
-
-
-    #
-    # Volume
-    #
+    # --------------------
+    # VOLUME
+    # --------------------
     if target == "volume":
 
-        if value is None:
-            return {
-                "success": False,
-                "message": "Volume value missing."
-            }
+        if target == "volume":
 
-        ok, output = _run([
-            "termux-volume",
-            "music",
-            str(value)
-        ])
+            if value is None:
+                import re
+                match = re.search(r"\b\d+\b", command.get("raw", ""))
+                if match:
+                    value = int(match.group())
+                else:
+                    return {
+                        "success": False,
+                        "message": "Volume value missing"
+                    }
+
+
+        ok, out = _run(["termux-volume", "music", str(value)])
 
         if not ok:
-            return {
-                "success": False,
-                "message": output
-            }
+            return {"success": False, "message": out}
 
-        return {
-            "success": True,
-            "message": f"Volume set to {value}."
-        }
+        return {"success": True, "message": f"Volume set to {value}"}
 
+    # --------------------
+    # FALLBACK
+    # --------------------
     return {
         "success": False,
         "message": f"Unsupported device: {target}"

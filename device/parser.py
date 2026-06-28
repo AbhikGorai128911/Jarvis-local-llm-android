@@ -1,42 +1,32 @@
 # device/parser.py
 
-VALID_ACTIONS = {
+VALID = {
     "torch": ["on", "off"],
     "wifi": ["on", "off"],
     "bluetooth": ["on", "off"],
-    "volume": ["set", "get"],
-    "brightness": ["set", "get"],
+    "volume": ["set"],
+    "brightness": ["set"],
     "battery": ["get"]
 }
 
 
 def parse(normalized):
-
     action = normalized.get("action")
     target = normalized.get("target")
+    value = normalized.get("value")
 
-    if not action or not target:
+    if not target:
         return {
             "success": False,
-            "message": "Could not understand device command"
+            "message": "No device detected"
         }
 
-    # enforce rules
-    if target in VALID_ACTIONS:
-        if action not in VALID_ACTIONS[target]:
+    if target in VALID:
+        if action not in VALID[target]:
             return {
                 "success": False,
-                "message": f"Invalid action '{action}' for {target}"
+                "message": f"Invalid action {action} for {target}"
             }
-
-    value = None
-
-    # optional value extraction
-    import re
-    match = re.search(r"\b\d+\b", normalized.get("raw", ""))
-
-    if match:
-        value = int(match.group())
 
     return {
         "success": True,

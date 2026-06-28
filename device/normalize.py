@@ -2,10 +2,9 @@
 import re
 
 ACTION_MAP = {
-    "on": ["on", "enable", "turn on", "switch on", "activate", "start"],
-    "off": ["off", "disable", "turn off", "switch off", "deactivate", "stop"],
-    "set": ["set", "change", "adjust"],
-    "get": ["what is", "check", "show", "status", "how much"]
+    "on": ["on", "enable", "turn on", "switch on", "activate", "start", "increase", "up", "louder"],
+    "off": ["off", "disable", "turn off", "switch off", "deactivate", "stop", "mute"],
+    "set": ["set", "change", "adjust"]
 }
 
 TARGET_MAP = {
@@ -19,37 +18,55 @@ TARGET_MAP = {
 
 
 def _match(text, words):
-    return any(re.search(rf"\b{re.escape(w)}\b", text) for w in words)
+    return any(w in text for w in words)
 
 
 def normalize(text: str):
-
     text = text.lower().strip()
 
     action = None
     target = None
+    value = None
 
-    # resolve target first (more stable)
+    # extract number FIRST (important for volume/brightness)
+    match = re.search(r"\b(\d{1,3})\b", text)
+    if match:
+        value = int(match.group(1))
+
+    # detect target
     for t, aliases in TARGET_MAP.items():
         if _match(text, aliases):
             target = t
             break
 
-    # resolve action
+    # detect action
     for a, aliases in ACTION_MAP.items():
         if _match(text, aliases):
             action = a
             break
 
-    # smart fallback rules
+    # SMART DEFAULTS
+    if target == "volume":
+        if value is not None:
+            action = "set"
+        elif action is None:
+            action = "set"
+
+    if target == "brightness":
+        if value is not None:
+            action = "set"
+        elif action is None:
+            action = "set"
+
+    if target in ["wifi", "bluetooth", "torch"] and action is None:
+        action = "on"
+
     if target == "battery":
         action = "get"
-
-    if target in ["wifi", "bluetooth", "torch"] and action == "set":
-        action = "on"
 
     return {
         "action": action,
         "target": target,
+        "value": value,
         "raw": text
     }
