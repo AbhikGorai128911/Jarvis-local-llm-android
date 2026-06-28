@@ -6,7 +6,7 @@ from commands.browser import execute as browser_execute
 from commands.music import execute as music_execute
 from commands.device import execute as device_execute
 from llm.local_llm import ask
-
+from communication.executor import execute as communication_execute
 
 def execute(intent, user_input):
 
@@ -30,6 +30,9 @@ def execute(intent, user_input):
 
     if intent == "device":
         return device_execute(user_input)
+
+    if intent == "communication":
+        return communication_execute(user_input)
 
     if intent == "unknown":
         ask(user_input)

@@ -80,7 +80,10 @@ def classify(user_input):
     if any(word in text for word in [
         "message",
         "text",
-        "sms"
+        "sms",
+        "call",
+        "dial",
+        "phone"
     ]):
         return "communication"
 

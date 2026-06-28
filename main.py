@@ -6,14 +6,14 @@ from core.tts import speak
 from core.logger import log
 from memory.memory import initialize
 from memory.memory import save_message
+from llm.local_llm import ask as ask_dynamic
+from llm.persistent_llm import start_llm, stop_llm, ask_persistent
+from control.confirmation import handle_confirmation
+from control.pending_actions import clear_pending
 from control.pending_actions import (
     get_pending,
     clear_pending
 )
-from llm.local_llm import ask as ask_dynamic
-from llm.persistent_llm import start_llm, stop_llm, ask_persistent
-
-
 
 def boot():
     print("=" * 40)
@@ -65,21 +65,23 @@ def main():
             break
 
 
-        if user_input.lower() == "yes":
+        
+        if user_input.lower() in ["", "y", "yes"]:
 
-            action = get_pending()
+                response = handle_confirmation()
 
-            if action:
+                if response["success"]:
+                     print(f"JARVIS > {response['message']}")
+                else:
+                     print(f"JARVIS > {response['message']}")
 
-                response = action()
+                continue
 
-                clear_pending()
+        if user_input.lower() in ["n", "no"]:
+             clear_pending()
+             print("JARVIS > Cancelled.")
 
-                print(
-                f"JARVIS > {response['message']}"
-                )
-
-            continue
+             continue
 
 
 
